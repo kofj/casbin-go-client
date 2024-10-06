@@ -2,10 +2,11 @@ package client
 
 import (
 	"context"
-	"google.golang.org/grpc"
 	"log"
 	"testing"
 	"time"
+
+	"google.golang.org/grpc"
 
 	"github.com/casbin/casbin/v2/util"
 )
@@ -26,7 +27,7 @@ func testNewEnforcer(t *testing.T) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	e, err = cc.NewEnforcer(ctx, Config{ModelText: ""})
+	e, err = cc.NewEnforcer(ctx, Config{ModelText: "", EnableAcceptJsonRequest: true})
 	if err != nil {
 		t.Fatalf("NewEnforcer() error: %v", err)
 	}

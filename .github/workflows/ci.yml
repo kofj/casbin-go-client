@@ -14,7 +14,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.15
+        go-version: 1.19
 
     - name: Set up Docker
       uses: docker-practice/actions-setup-docker@master
@@ -23,8 +23,13 @@ jobs:
       run: |
         set -x
         docker version
-        docker run -d -p 50051:50051 casbin/casbin-server
-      
+        docker run -id -p 50051:50051 \
+          -e CONNECTION_CONFIG_PATH=/config/connection_config.json \
+          -v $GITHUB_WORKSPACE/config:/config \
+          -v $GITHUB_WORKSPACE/examples:/data/examples \
+          --name my-casbin-server-config \
+          -d casbin/casbin-server
+
     - name: Go Test
       run: go test ./...
 
@@ -32,10 +37,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+    
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+    
       - name: Run semantic-release
         if: github.repository == 'casbin/casbin-go-client' && github.event_name == 'push'
         run: |
-          export PATH="$(yarn global bin):$PATH"
+          yarn -v
+          node -v
           yarn global add semantic-release
           semantic-release
         env:
